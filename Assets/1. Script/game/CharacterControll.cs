@@ -5,8 +5,10 @@ using UnityEngine;
 public class CharacterControll : MonoBehaviour
 {
     [SerializeField] Transform _characterImg;
+    [SerializeField] GameObject prefabToSpawn;
     static float _speed;
     static bool _startGame = false;
+    public float spawnDistance = 1f;
     static SpriteRenderer _spriteRenderer;
 
 
@@ -24,6 +26,7 @@ public class CharacterControll : MonoBehaviour
     {
         _speed = 1f;
         Debug.Log(_characterImg);
+        
         _spriteRenderer = _characterImg.GetComponent<SpriteRenderer>();
         _startGame = true;
     }
@@ -50,6 +53,29 @@ public class CharacterControll : MonoBehaviour
             if (Input.GetKey(KeyCode.A)) { transform.Translate(-Vector2.right * Time.deltaTime * _speed); }
             if (Input.GetKey(KeyCode.W)) { transform.Translate(Vector2.up * Time.deltaTime * _speed); }
             if (Input.GetKey(KeyCode.S)) { transform.Translate(-Vector2.up * Time.deltaTime * _speed); }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                ClickAttack(mousePosition);
+            }
         }
+    }
+
+    private void ClickAttack(Vector3 mousePosition)
+    {
+        // 마우스 포인터의 현재 위치를 가져오기
+        mousePosition.z = 0f;  // z 축을 0으로 설정 (2D 공간을 가정)
+
+        // 오브젝트에서 마우스 포인터 방향 계산
+        Vector3 direction = mousePosition - transform.position;
+        direction.Normalize();  // 방향을 단위 벡터로 정규화
+
+        // 새로운 오브젝트를 생성하고 특정 거리에 위치하도록 조절
+        Vector3 spawnPosition = transform.position + direction * spawnDistance;
+        spawnPosition.z = 10f;
+        Quaternion spawnRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(-direction.y, -direction.x) * Mathf.Rad2Deg);
+
+        // 새로운 오브젝트 생성
+        GameObject newObject = Instantiate(prefabToSpawn, spawnPosition, spawnRotation);
     }
 }
